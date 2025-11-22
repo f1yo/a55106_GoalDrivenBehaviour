@@ -1,50 +1,54 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
-using System;
 
-public class Node {
-
+public class Node 
+{
     public Node parent;
     public float cost;
     public Dictionary<string, int> state;
     public GAction action;
 
-    public Node(Node parent, float cost, Dictionary<string, int> allStates, GAction action) {
-
+    public Node(Node parent, float cost, Dictionary<string, int> allStates, GAction action) 
+    {
         this.parent = parent;
         this.cost = cost;
         this.state = new Dictionary<string, int>(allStates);
         this.action = action;
     }
 
-    public Node(Node parent, float cost, Dictionary<string, int> allStates, Dictionary<string, int> beliefStates, GAction action) {
-
+    public Node(Node parent, float cost, Dictionary<string, int> allStates, Dictionary<string, int> beliefStates, GAction action) 
+    {
         this.parent = parent;
         this.cost = cost;
         this.state = new Dictionary<string, int>(allStates);
-        foreach (KeyValuePair<string, int> b in beliefStates) {
 
-            if (!this.state.ContainsKey(b.Key)) {
+        foreach (KeyValuePair<string, int> b in beliefStates) 
+        {
+
+            if (!this.state.ContainsKey(b.Key)) 
+            {
 
                 this.state.Add(b.Key, b.Value);
             }
         }
-
         this.action = action;
     }
 }
 
-public class GPlanner {
+public class GPlanner 
+{
 
-    public Queue<GAction> plan(List<GAction> actions, Dictionary<string, int> goal, WorldStates beliefStates) {
+    public Queue<GAction> plan(List<GAction> actions, Dictionary<string, int> goal, WorldStates beliefStates) 
+    {
 
         List<GAction> usableActions = new List<GAction>();
 
-        foreach (GAction a in actions) {
+        foreach (GAction a in actions) 
+        {
 
-            if (a.IsAchievable()) {
+            if (a.IsAchievable()) 
+            {
 
                 usableActions.Add(a);
             }
@@ -55,65 +59,78 @@ public class GPlanner {
 
         bool success = BuildGraph(start, leaves, usableActions, goal);
 
-        if (!success) {
+        if (!success) 
+        {
 
             Debug.Log("NO PLAN");
             return null;
         }
 
         Node cheapest = null;
-        foreach (Node leaf in leaves) {
+        foreach (Node leaf in leaves) 
+        {
 
-            if (cheapest == null) {
+            if (cheapest == null) 
+            {
 
                 cheapest = leaf;
-            } else {
+            } else if (leaf.cost < cheapest.cost) 
+            {
 
-                if (leaf.cost < cheapest.cost) {
-
-                    cheapest = leaf;
-                }
+                cheapest = leaf;
             }
         }
-
         List<GAction> result = new List<GAction>();
         Node n = cheapest;
 
-        while (n != null) {
+        while (n != null) 
+        {
 
-            if (n.action != null) {
+            if (n.action != null) 
+            {
 
                 result.Insert(0, n.action);
             }
+
             n = n.parent;
         }
 
         Queue<GAction> queue = new Queue<GAction>();
-        foreach (GAction a in result) {
+
+        foreach (GAction a in result) 
+        {
 
             queue.Enqueue(a);
         }
 
         Debug.Log("The Plan is: ");
-        foreach (GAction a in queue) {
+        foreach (GAction a in queue) 
+        {
 
             Debug.Log("Q: " + a.actionName);
         }
+
         return queue;
     }
 
-    bool BuildGraph(Node parent, List<Node> leaves, List<GAction> usableActions, Dictionary<string, int> goal) {
+    private bool BuildGraph(Node parent, List<Node> leaves, List<GAction> usableActions, Dictionary<string, int> goal) 
+    {
 
         bool foundPath = false;
 
-        foreach (GAction action in usableActions) {
+        foreach (GAction action in usableActions) 
+        {
 
-            if (action.IsAchievableGiven(parent.state)) {
+            if (action.IsAhievableGiven(parent.state)) 
+            {
 
                 Dictionary<string, int> currentState = new Dictionary<string, int>(parent.state);
-                foreach (KeyValuePair<string, int> eff in action.effects) {
 
-                    if (!currentState.ContainsKey(eff.Key)) {
+                foreach (KeyValuePair<string, int> eff in action.effects) 
+                {
+
+                    if (!currentState.ContainsKey(eff.Key)) 
+                    {
 
                         currentState.Add(eff.Key, eff.Value);
                     }
@@ -121,39 +138,55 @@ public class GPlanner {
 
                 Node node = new Node(parent, parent.cost + action.cost, currentState, action);
 
-                if (GoalAchieved(goal, currentState)) {
+                if (GoalAchieved(goal, currentState)) 
+                {
 
                     leaves.Add(node);
                     foundPath = true;
-                } else {
-
+                } 
+                else 
+                {
                     List<GAction> subset = ActionSubset(usableActions, action);
                     bool found = BuildGraph(node, leaves, subset, goal);
-                    if (found) foundPath = true;
+
+                    if (found) 
+                    {
+
+                        foundPath = true;
+                    }
                 }
             }
         }
-
         return foundPath;
     }
 
-    private List<GAction> ActionSubset(List<GAction> actions, GAction removeMe) {
+    private List<GAction> ActionSubset(List<GAction> actions, GAction removeMe) 
+    {
 
         List<GAction> subset = new List<GAction>();
+
         foreach (GAction a in actions) {
 
-            if (!a.Equals(removeMe)) subset.Add(a);
+            if (!a.Equals(removeMe)) {
+
+                subset.Add(a);
+            }
         }
         return subset;
     }
 
-    private bool GoalAchieved(Dictionary<string, int> goal, Dictionary<string, int> state) {
+    private bool GoalAchieved(Dictionary<string, int> goal, Dictionary<string, int> state) 
+    {
 
-        foreach (KeyValuePair<string, int> g in goal) {
+        foreach (KeyValuePair<string, int> g in goal) 
+        {
 
-            if (!state.ContainsKey(g.Key)) return false;
+            if (!state.ContainsKey(g.Key))
+            {
+
+                return false;
+            }
         }
-
         return true;
     }
 }

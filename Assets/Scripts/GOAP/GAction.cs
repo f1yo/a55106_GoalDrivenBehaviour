@@ -1,10 +1,12 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public abstract class GAction : MonoBehaviour {
+public abstract class GAction : MonoBehaviour 
+{
 
+    
     public string actionName = "Action";
     public float cost = 1.0f;
     public GameObject target;
@@ -20,28 +22,28 @@ public abstract class GAction : MonoBehaviour {
     public WorldStates beliefs;
     public bool running = false;
 
-    public GAction() {
-
+    public GAction() 
+    {
         preconditions = new Dictionary<string, int>();
         effects = new Dictionary<string, int>();
     }
 
-    private void Awake() {
-
+    private void Awake() 
+    {
         agent = this.gameObject.GetComponent<NavMeshAgent>();
 
-        if (preConditions != null) {
-
-            foreach (WorldState w in preConditions) {
-
+        if (preConditions != null) 
+        {
+            foreach (WorldState w in preConditions) 
+            {
                 preconditions.Add(w.key, w.value);
             }
         }
 
-        if (afterEffects != null) {
-
-            foreach (WorldState w in afterEffects) {
-
+        if (afterEffects != null) 
+        {
+            foreach (WorldState w in afterEffects) 
+            {
                 effects.Add(w.key, w.value);
             }
         }
@@ -50,18 +52,23 @@ public abstract class GAction : MonoBehaviour {
         beliefs = this.GetComponent<GAgent>().beliefs;
     }
 
-    public bool IsAchievable() {
-
+    public bool IsAchievable() 
+    {
         return true;
     }
 
-    public bool IsAchievableGiven(Dictionary<string, int> conditions) {
+    public bool IsAhievableGiven(Dictionary<string, int> conditions) 
+    {
 
-        foreach (KeyValuePair<string, int> p in preconditions) {
+        foreach (KeyValuePair<string, int> p in preconditions) 
+        {
 
-            if (!conditions.ContainsKey(p.Key)) return false;
+            if (!conditions.ContainsKey(p.Key)) 
+            {
+
+                return false;
+            }
         }
-
         return true;
     }
 

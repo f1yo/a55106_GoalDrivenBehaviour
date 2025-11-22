@@ -50,9 +50,7 @@ public class GAgent : MonoBehaviour {
 
         if (currentAction != null && currentAction.running) {
 
-            float distanceToTarget = Vector3.Distance(currentAction.target.transform.position, this.transform.position);
-            if (currentAction.agent.hasPath && distanceToTarget < 2.0f)//currentAction.agent.remainingDistance < 0.5f)
-                {
+            if (currentAction.agent.hasPath && currentAction.agent.remainingDistance < 1.0f) {
 
                 if (!invoked) {
 
@@ -70,7 +68,7 @@ public class GAgent : MonoBehaviour {
 
             foreach (KeyValuePair<SubGoal, int> sg in sortedGoals) {
 
-                actionQueue = planner.plan(actions, sg.Key.sGoals, beliefs);
+                actionQueue = planner.plan(actions, sg.Key.sGoals, null);
 
                 if (actionQueue != null) {
 
